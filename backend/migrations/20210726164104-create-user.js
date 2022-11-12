@@ -1,33 +1,37 @@
 'use strict';
-module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('users', {
-      user_id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      first_name: {
-        type: Sequelize.STRING
-      },
-      last_name: {
-        type: Sequelize.STRING
-      },
-      email: {
-        type: Sequelize.STRING
-      },
-      created_at: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updated_at: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('users');
-  }
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+
+    static associate({ Comment }) {
+      User.hasMany(Comment, { as: 'author', foreignKey: 'author_id' })
+    }
+
+  };
+  User.init({
+    userId: {
+      type: DataTypes.SMALLINT,
+      primaryKey: true,
+      autoIncrement: true
+
+    },
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
+    email: DataTypes.STRING,
+    role: {
+      type: DataTypes.ENUM,
+      values: [
+        'reviewer',
+        'admin',
+      ],
+    },
+    passwordDigest: DataTypes.STRING
+  }, {
+    sequelize,
+    underscored: true,
+    modelName: 'User',
+  });
+  return User;
 };
